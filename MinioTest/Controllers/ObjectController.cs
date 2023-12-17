@@ -8,24 +8,24 @@ namespace MinioTest.Controllers
     public class ObjectController : ControllerBase
     {
         private readonly ILogger<ObjectController> _logger;
-        private readonly MinioObject _minio;
+        private readonly IMinioService _minioService;
 
-        public ObjectController(ILogger<ObjectController> logger, MinioObject minio)
+        public ObjectController(ILogger<ObjectController> logger, IMinioService minioService)
         {
             _logger = logger;
-            _minio = minio;
+            _minioService = minioService;
         }
         [HttpGet]
         public async Task<ActionResult> Get(string token)
         {
-            var result = await _minio.GetObject(token);
+            var result = await _minioService.GetObject(token);
             return File(result.Bytes, result.ContentType);
         }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromForm] IFormFile file)
         {
-            var result = await _minio.PutObject(file);
+            var result = await _minioService.PutObject(file);
             return Ok(new { filename = result });
         }
     }

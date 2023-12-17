@@ -33,7 +33,7 @@ builder.Services.AddSwaggerGen(s =>
         }
     });
 });
-builder.Services.AddScoped<MinioObject>();
+builder.Services.AddScoped<IMinioService, MinioManager>();
 builder.Services.AddControllers();
 
 builder.Services.AddMinio(configureClient => configureClient

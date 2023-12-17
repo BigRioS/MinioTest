@@ -1,6 +1,4 @@
-﻿using Minio.DataModel;
-
-namespace MinioTest.Services.Minio.Model
+﻿namespace MinioTest.Model
 {
     public class GetObjectDto
     {

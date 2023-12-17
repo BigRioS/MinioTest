@@ -1,17 +1,17 @@
 ﻿using Minio;
 using Minio.DataModel.Args;
 using MinioTest.Model;
-using MinioTest.Services.Minio.Model;
 
 namespace MinioTest.Services.Minio
 {
-    public class MinioObject
+    public class MinioManager : IMinioService
     {
         private readonly IMinioClient _minioClient;
         private readonly string? _bucket = Accessor.AppConfiguration["Minio:Bucket"];
 
         private Task<bool> IsBucketExists() =>
             _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_bucket));
+
         private async Task<string> IsFileExists(string token)
         {
             var statObjectArgs = new StatObjectArgs()
@@ -21,14 +21,15 @@ namespace MinioTest.Services.Minio
             var status = await _minioClient.StatObjectAsync(statObjectArgs);
             if (status == null)
                 throw new Exception("File not found or deleted");
-            
+
             return status.ContentType;
         }
 
-        public MinioObject(IMinioClientFactory minioClientFactory)
+        public MinioManager(IMinioClientFactory minioClientFactory)
         {
             _minioClient = minioClientFactory.CreateClient();
         }
+
         public async Task<string> PutObject(IFormFile file)
         {
             if (!await IsBucketExists())
@@ -47,12 +48,13 @@ namespace MinioTest.Services.Minio
             await _minioClient.PutObjectAsync(putObjectArgs);
             return filename;
         }
+
         public async Task<GetObjectDto> GetObject(string token)
         {
             if (!await IsBucketExists())
                 throw new Exception("NotFound");
-            
-            var contentType= await IsFileExists(token);
+
+            var contentType = await IsFileExists(token);
 
             var destination = new MemoryStream();
 
